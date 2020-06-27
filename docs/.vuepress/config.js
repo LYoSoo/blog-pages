@@ -23,9 +23,9 @@ module.exports = {
             { text: '有问题请问我', link: 'https://baidu.com' }
         ],
         sidebar: {
-            '/': [
-                ["/", "回到首页"],
-            ]
+            // '/': [
+            //     ["/", "回到首页"],
+            // ]
         }
         // [{ // 左侧导航栏配置
         //     title: 'Vuepress搭建'
