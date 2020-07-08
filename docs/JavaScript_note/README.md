@@ -69,3 +69,56 @@
 >
 > 当引擎执行代码时，会从最内部的作用域开始查找，无法在当前作用域找到对应的变量，则会到上一级嵌套的作用域中继续查找。**作用域会在找到第一个匹配的标识符时停止。**
 
+### 三、函数作用域和块作用域
+
+> ​	**函数作用域： 属于这个函数的全部变量都可以在整个函数的范围内使用以及复用（嵌套的作用域也可以）。**
+>
+> ```javascript
+> 	function foo(a){
+>         var b = 2;
+>         function bar(){
+>             ...
+>         }
+>         var c = 3;
+>     }
+> ```
+>
+> > ​	上面的代码里函数 `foo` 的作用域气泡中包含了 `b` 、 `bar` 、 `c` 三个标识符，这些标识符所代表的变量或函数都属于所处作用域的气泡。
+> >
+> > ​	全局的作用域气泡含有 `foo`这个标识符。
+> >
+> > ​	所以我们在全局中只可以访问 `foo`  无法访问 `foo` 内部的作用域气泡。
+
+##### 隐藏内部
+
+​		上面之前我们可以看到，我们是无法从外面的作用域访问到函数内部的作用域，在软件设计中，**我们要最小限度的暴漏内部的内容，将其他内容“隐藏”起来，比如模块或者内部API设计**。
+
+​		我们可以讲代码中的片段，用一个函数声明对他进行包装，实际就是把他隐藏了起来。
+
+```javascript
+	function doSomething(a){
+        b = a + doSomethingElse(a * 2);
+        console.log(b * 3);
+    }
+	function doSomethingElse(a){
+        return a - 1;
+    }
+	var b;
+	doSomething(2);			//15
+```
+
+> ​	上面的代码片段， 变量 `b` 和函数 `doSomethingElse` 都应该是函数  `doSomething` 的内部“私有”内容，但现在暴露在了外面， 也就是可以访问 `doSomething`的作用域同时可以访问变量 `b` 和函数 `doSomethingElse`,  这样不仅没必要，而且还是“危险的”， 造成不必要的麻烦， 合理的设计是要帮他们隐藏在 `doSomething`的内部。
+>
+> ```javascript
+> 	function doSomething(a){
+>         function doSomethingElse(a){
+> 			return a - 1;
+>         }
+>         var b; 
+>         b = a + doSomethingElse(a * 2);
+>         console.log(b * 3);
+>     }
+> 	doSomething(2);			//15
+> ```
+>
+> 
