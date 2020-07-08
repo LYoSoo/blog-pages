@@ -1,7 +1,7 @@
 /*
  * @Author: your name
  * @Date: 2020-06-10 15:28:11
- * @LastEditTime: 2020-06-16 13:58:02
+ * @LastEditTime: 2020-07-08 13:38:03
  * @LastEditors: LYoSoo
  * @Description: In User Settings Edit
  * @FilePath: \cloudgise:\normal-time\vuepress-d\docs\.vuepress\config.js
@@ -22,11 +22,11 @@ module.exports = {
             { text: 'GitHub', link: 'https://github.com/LYoSoo' },
             { text: '有问题请问我', link: 'https://baidu.com' }
         ],
-        sidebar: {
-            // '/': [
-            //     ["/", "回到首页"],
-            // ]
-        }
+        // sidebar: {
+        //     // '/': [
+        //     //     ["/", "回到首页"],
+        //     // ]
+        // }
         // [{ // 左侧导航栏配置
         //     title: 'Vuepress搭建'
         //     // collapsable: false, //是否展开
