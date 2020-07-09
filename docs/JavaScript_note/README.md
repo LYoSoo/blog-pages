@@ -111,14 +111,76 @@
 >
 > ```javascript
 > 	function doSomething(a){
->         function doSomethingElse(a){
+>      function doSomethingElse(a){
 > 			return a - 1;
->         }
->         var b; 
->         b = a + doSomethingElse(a * 2);
->         console.log(b * 3);
->     }
+>      }
+>      var b; 
+>      b = a + doSomethingElse(a * 2);
+>      console.log(b * 3);
+>  }
 > 	doSomething(2);			//15
 > ```
 >
+> 此时 `b` 和 `doSomethingElse` 都无法从外部被访问， 只能被 `doSomething` 所控制，将其私有化了。
+>
+> ​	“隐藏”作用域的变量和函数的另一个好处是可以避免同名标识符之间的冲突，当你无意间命名了两个相同的标识符，就会造成覆盖。
+>
+> ```javascript
+> 	function foo(){
+>         function bar(a){
+>             i = 3;			//可以修改下面for循环中的 i 
+>             console.log(a + i);
+>         }
+>         for(var i = 0; i < 10; i++ ){
+>             bar(i * 2);		// i 被赋值为3， 一直小于10 造成死循环
+>         }
+>     }
+> ```
+>
+> 如果第三方库没有隐藏好自己的内部变量，在我们同时引入多个三方库的时候，很容易的引发冲突
+>
 > 
+>
+> 所以第三方的库都会在全局作用域中声明一个足够特别的变量，用来做自己的命名空间，需要暴露给外部的功能都是其属性，避免讲自己的标识符暴露在顶级的词法作用域中。
+>
+> ```javascript
+> 	var specialModuleName = {
+>         name: "",
+>         doSomething: function(){},
+>         doSomethingElse: function(){},
+>     }
+> ```
+
+#### 函数作用域
+
+> ​	上面我们说了可以通过函数把想要隐藏的标识符包裹起来，这样外部的作用域无法访问内部的标识符。
+>
+> ```javascript
+> 	var a = 2;
+> 	function foo() {
+>         var a = 3;
+>         console.log(a);			// 3
+>     }
+> 	foo();
+> 	console.log(a);				//2
+> ```
+>
+> 这样虽然解决了一些问题，但是还是需要声明 `foo` 这个函数，并在之后对其进行调用，声明的 `foo` 函数同样污染了当前作用域。
+>
+> 在JavaScript中有这样一种解决方案
+>
+> ```javascript
+> 	var a = 2;
+> 	((function foo() {
+>         var a = 3;
+>         console.log(a);		//3
+>     })();
+>     console.log(a);			//2
+> ```
+>
+> 函数被包裹在 () 内部， 变成了表达式，在末尾加上 () 用来执行这个表达式， 这种写法叫做“立即执行函数表达式” 平时叫  立即执行函数。
+>
+> 这样 `foo` 就被隐藏起来了，不会污染外部的作用域。
+>
+> 
+
