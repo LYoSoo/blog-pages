@@ -158,9 +158,9 @@
 > ```javascript
 > 	var a = 2;
 > 	function foo() {
->         var a = 3;
->         console.log(a);			// 3
->     }
+>      var a = 3;
+>      console.log(a);			// 3
+>  }
 > 	foo();
 > 	console.log(a);				//2
 > ```
@@ -172,15 +172,117 @@
 > ```javascript
 > 	var a = 2;
 > 	((function foo() {
->         var a = 3;
->         console.log(a);		//3
->     })();
->     console.log(a);			//2
+>      var a = 3;
+>      console.log(a);		//3
+>  })();
+>  console.log(a);			//2
 > ```
 >
-> 函数被包裹在 () 内部， 变成了表达式，在末尾加上 () 用来执行这个表达式， 这种写法叫做“立即执行函数表达式” 平时叫  立即执行函数。
+> 函数被包裹在 () 内部， 变成了表达式，在末尾加上 () 用来执行这个表达式， 这种写法叫做“立即执行函数表达式” 平时叫  立即执行函数（IIFE）。
 >
 > 这样 `foo` 就被隐藏起来了，不会污染外部的作用域。
 >
-> 
+> ​		立即执行函数还一个用法就是把他们当作函数调用并传递参数进去。
+>
+> ```javascript
+> 	var a = 2;
+> 	(function IIFE(global){
+>         var a = 3;
+>         console.log(a);			//3
+>         console.log(global.a);		//2
+>     })(window);
+> 	console.log(a);			//2
+> ```
+>
+> 在IIFE中传入 `window` 对象，把参数命名为 `global`。
+>
+> **IIFE更重要的一种用法是倒置代码的运行顺序，将需要运行的函数放在第二位。**
+>
+> ```javascript
+> 	var a = 2;
+> 	(function IIFE(def){
+> 		def(window);
+> 	})(function def(global){
+> 		var a = 3;
+> 		console.log(a); 		//3
+> 		console.log(global.a);		//2
+> 	})
+> ```
+>
+> > ​	上面代码函数`def`定义在第二部分， 作为 `IIFE`的参数传递进去， 然后在`IIFE`内部调用 函数 `def`，并将 `window` 传入当作自定义 `global` 的值。
+
+#### 块作用域
+
+> ​	我们都知道 `ES6` 引入了新的关键字 `let`， 是一种新的变量声明方式。
+
+**`let` 可以将变量绑定到所在的任意作用域中，通常是 { } 内部， 也就是 `let` 为其声明的变量隐式的劫持了所在的块作用域。**
+
+```javascript
+	var foo = true;
+	if(foo){
+        let bar = foo * 2;
+        console.log(bar);
+    }
+	console.log(bar);		//ReferenceError
+```
+
+上面说的 `let` 的行为是隐式的，可能后续代码的维护中会将 `let` 声明移动位置造成错误，为此我们可以显示的创建一个块，将 `let`放在内部。
+
+```javascript
+	var foo = true;
+	if(foo){
+        {
+            let bar = foo * 2;
+            console.log(bar);
+        }
+    }
+	console.log(bar);		//ReferenceError
+```
+
+**使用 `let` 进行的声明不会在块作用域中提升，声明的代码被运行之前，声明并不“存在”。**
+
+```javascript
+	{
+        console.log(a);		//ReferenceError
+        let a = 2;
+    }
+```
+
+`let` 和 `var` 声明的 `for`循环区别
+
+```javascript
+	for(var i =0; i< 10; i++){
+        console.log(i);
+    }
+	console.log(i);			//11
+
+//上述代码实际上可以看作
+	var i;
+	for(i =0; i< 10; i++){
+        console.log(i)
+    };
+	console.log(i);
+//相当于污染了上层作用域
+```
+
+当用 `let` 进行声明时；
+
+```javascript
+	for(let i=0; i< 10; i++){
+        console.log(i);
+    };
+	console.log(i);			//ReferenceError
+```
+
+`let` 不仅将 `i` 绑定在了  `for` 循环的块中，实际还将其重新绑定到了循环的每一个迭代中，确保使用上一个循环第二代结束时的值进行重新赋值。
+
+```javascript
+	{
+        let j;
+        for(j=0; j< 10; j++){
+            let i = j;		//没个i都会进行重新的绑定，
+            console.log(i)l
+        }
+    }
+```
 

@@ -8,3 +8,6 @@
 
 ## [regex正则表达式](/regex)
 ## [flex布局](/flex)
+
+## [你不知道的JavaScript_笔记](/JavaScript_note)
+
