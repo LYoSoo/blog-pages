@@ -286,3 +286,85 @@
     }
 ```
 
+#### const
+
+> ​	`const` 是 `ES6` 引入另一种声明方式，他也同样可以用来创建块级作用域，但是和 `let` 不同，使用 `const` 声明变量之后，值是固定的(当为常量的时候)，之后对常量的修改会引起错误。
+>
+> ```javascript
+> 	const a = 2;
+> 	a = 3;			//ReferenceError;
+> ```
+>
+> 其实可以看成 变量的引用地址不可改变， 当用 `const` 声明对象的时候。
+>
+> ```javascript
+> 	const a = { name: "张三" };
+> 	a.name = "李四";
+> 	console.log(a);		//李四。
+> ```
+
+### 四、变量提升
+
+JavaScript的运行顺序并不是从下到下依次运行的。
+
+引擎会在解释JavaScript代码之前对其进行编译， 变量和包括函数在内的 声明都会在任何代码被执行之前首先处理。
+
+当JavaScript 看到 `var a = 2;`	时，会把他看成两个声明， 第一部分时 `var a = 2` 是在编译阶段进行的。
+
+第二部分 `a = 2` 会留在原地 等待执行阶段。
+
+```javascript
+	var a = 2;
+	//上面的代码会进行如下形式的处理。
+	var a;
+```
+
+函数也会进行提升
+
+```javascript
+	foo();
+	function foo(){
+        console.log(a);
+        var a = 2;
+    }
+```
+
+但是函数表达式无法进行提升
+
+```javascript
+	foo();		//TypeError;
+	var foo = function bar() {
+    	//...
+    }
+    //上面代码进行提升后会变成下面的样子
+    
+    var foo;
+	foo();
+	foo = function bar() {
+        // ...
+    }
+```
+
+**上面说了，声明阶段会提升，而赋值的时候，变量会停在原地，等轮到他执行的时候。**
+
+**函数声明和变量声明都会进行提升，但同时出现时，函数声明优先于变量声明。**
+
+```javascript
+	foo();		//1;
+	var foo;
+	function foo(){
+        console.log(1);
+    }
+	foo = function (){
+        console.log(2);
+    }
+// 	上述代码可以理解为下面的形式
+	function foo(){
+        console.log(1);
+    }
+	foo();
+	foo = function () {
+        console.log(2);
+    }
+```
+
