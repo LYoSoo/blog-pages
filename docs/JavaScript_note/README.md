@@ -368,3 +368,169 @@ JavaScript的运行顺序并不是从下到下依次运行的。
     }
 ```
 
+> ​	尽管 `var foo` 声明在 `function foo(){...}` 之前， 但是由于函数优先， 到 `var foo` 时， 发现他是重复的声明，所以自动将其忽略。
+
+**尽管重复的声明会被忽略，但是后面的同名函数还是会覆盖前面的函数的**
+
+```javascript
+	foo();			//3
+	function foo(){
+        console.log(1);
+    }
+	foo = function (){
+        console.log(2);
+    }
+	function foo(){
+        console.log(3);
+    }
+```
+
+
+
+### 五、作用域和闭包
+
+首先我们先来看下面的代码
+
+```javascript
+	function foo(){
+        var a = 2;
+        function bar(){
+            console.log(a);
+        }
+        return bar;
+    }
+	var baz = foo();
+	baz();		//2   这就是闭包
+```
+
+> ​		函数 `bar` 能够通过词法作用域来访问 `foo()` 的内部作用域，我们将 `bar` 当作值类型进行传递，我们把 `bar` 所引用的函数对象当作返回值。
+>
+> foo() 执行后 其返回值也就是 `bar` 函数，赋值给变量 `baz` 并调用 `baz()` ， **其实是通过不同的标识符引用调用函数 bar。**
+>
+> bar 可以正确的运行，但是在 自己定义的词法作用域之外的地方执行。
+>
+> ​		在 ` foo` 执行后，通常会期待 `foo()`整个内部作用域都会被销毁，我们的引擎有垃圾回收器来释放不在使用的内存空间，看起来 `foo()` 的内容不会被使用，所以很自然的想要对其进行回收。
+>
+> ​		但是闭包的 神奇之处在于可以组织这样的事情发生，实际上内部作用域仍然存在，导致他没有被回收，谁在使用这个内部作用域呢，是 `bar()` 本身在使用。因为`bar`  声明在了函数 `foo` 的内部，它拥有了函数 `foo` 内部作用域的闭包，使得该作用域一直存在，让 `bar` 在之后任何时间都可以引用。
+>
+> ​		**`bar` 保持着对该作用域的引用，这个引用就叫做闭包。**
+>
+> ​		`bar` 函数在定义时的词法作用域以外被调用， 闭包使函数在别处调用时可以继续访问定义时的词法作用域。
+
+
+
+无论用何种方式对函数类型的值进行传递，当函数在别处调用时都可以观察到闭包。
+
+```javascript
+	function foo(){
+        var a = 2;
+        function bar(){
+            console.log(a);
+        }
+        baz(bar);
+    }
+	function baz(fn){
+        fn();		//这就是闭包
+    }
+```
+
+> ​	 我们把内部函数 `bar` 传递给 `baz` , 当我们在`baz` 内部调用 `bar` 时（也就是`baz` 内的 `fn` 函数）， 因为闭包的缘故，他仍然可以访问 `foo`的内部变量 `a`.
+
+
+
+也可以用间接的方式传递函数。
+
+```javascript
+	var fn;
+	function foo(){
+        var a = 2;
+        function baz() {
+            console.log(a);
+        }
+        fn = baz;
+    }
+	function bar(){
+        fn();	//闭包；
+    }
+	foo();
+	bar();
+```
+
+**无论用何种方式将内部函数传递到词法作用域以外的地方，他都会保持对原来定义的作用域的引用，无论在何处执行这个函数都会使用闭包。**
+
+看下面一个例子
+
+```javascript
+	function wait(message) {
+        setTimeout(function timer() {
+            console.log(message);
+        }, 1000)
+    }
+	wait("hello");
+```
+
+我们讲一个内部函数  `timer`  传递给了 `setTimeout()`   `timer`  具有涵盖 `wait()`  作用域的闭包， 因此保留了对 `message` 的引用。
+
+wait 执行 1000 毫秒之后，他的内部作用域仍然不会消失， `timer` 函数仍然保有 wait(...) 作用域的闭包。
+
+​		在引擎的内部，内置工具函数 `setTimeout` 保持着对一个参数的引用， 可能是匿名函数  在上面的代码中就是 `timer` 函数，引擎会调用这个函数，词法作用域在这个过程中保持完整。
+
+**本质上无论何时何地，如果将（访问他们各自词法作用域）的函数当作第一级的值类型并到处传递，你就会看到闭包的应用。 在定时器、事件监听器、AJAX请求或者任何其他的异步请求和同步请求任务中，只要使用了回调函数，其实都在使用闭包。
+
+#### 循环和闭包
+
+​		for 循环是很常见的闭包
+
+```javascript
+	for(var i = 0; i<= 5; i++){
+        setTimeout(function timer(){
+            console.log(i);
+        },i * 1000);
+    }
+```
+
+我们预期上述代码会依次输出 1 - 5 ，每秒一次， 每次一个
+
+实际上，他会输出 5 个 6， 每秒一次。
+
+> ​	循环的终止条件是 `i > 5` ， 首次成立的条件是 `i = 6`。 因此输出的值是循环的最终值 也就是 `6`。
+>
+> ​	其实，就算是`setTimeout` 的延迟是 0 ， 输出的结果也不会变， 因为回调函数的执行是在循环结束时才执行，尽管他们在每次的时候都获取了一个 `i` 的副本，但是他们获取到的是一个在全局作用域下的  `i`  实际上是同一个 `i` 。
+
+​		我们尝试用立即执行函数来改写一下这个函数。
+
+```javascript
+	for(var i=0; i<= 5; i++){
+        (function(){
+            var j = i;
+            setTimeout(function timer(){
+                console.log(j);
+            }, i * 1000)
+        })()
+    }
+
+//	下面可以对其进行一些改进
+	for(var i = 0; i<= 5; i++){
+        (function (j){
+            setTimeout(function timer(){
+                console.log(j)
+            }, j * 1000)
+        })(i)
+    }
+//  使用块级作用域
+	for(var i =0; i<=5; i++){
+        let j = i;
+        setTimeout(function timer(){
+            console.log(j);
+        }, i * 1000)
+    }
+
+// 最终方案
+	for(let i =0; i<= 5; i++){
+        setTimeout(function timer(){
+            console.log(i);
+        }. i * 1000)
+    }
+//这样变量不止被声明一次，每次迭代都会进行新的声明，然后用上一次迭代的结束值来初始化该变量。
+```
+
