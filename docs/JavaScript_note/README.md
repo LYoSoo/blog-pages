@@ -534,3 +534,101 @@ wait 执行 1000 毫秒之后，他的内部作用域仍然不会消失， `time
 //这样变量不止被声明一次，每次迭代都会进行新的声明，然后用上一次迭代的结束值来初始化该变量。
 ```
 
+### 模块
+
+我们看如下代码
+
+```javascript
+	function coolModule(){
+        var something = "something";
+        var list = [1,2,3];
+        function doSomething() {
+            console.log(something);
+        }
+        function joinList() {
+            console.log(list.join("*"));
+        }
+        return{
+            doSomething: dosomething,
+            joinList: joinList
+        }
+    }
+	var foo = coolModule();
+	foo.doSomething();			//something;
+	foo.joinList();				// 1*2*3;
+```
+
+> ​	coolModule 是一个函数，必须要通过调用他来创建模块实例，如果外部没有调用该函数，则内部作用域和闭包都无法被创建。
+>
+> ​	并且 `coolModule` 返回的是一个对象字面量语法 `{key: value}` 来表示的对象，这个返回对象含有对内部函数而不是对内部数据变量的引用。我们保持内部变量是隐藏并且私有的状态，可以将这个对象类型的返回值当作是模块的公共API。
+>
+> ​	doSomething() 与  joinList() 函数具有涵盖模块内部作用域的闭包 (通过实例化 coolModule 来实现)。
+>
+> **模块模式具备两个必要的条件:**
+>
+> + **必须有外部的封闭函数，该函数至少要被调用一次。  （每次调用都会生成新的模块实例）**
+> + **封闭函数内必须返回至少一个内部函数，这样内部函数在私有作用域中能够形成闭包，并且可以修改或者访问私有的状态。**
+
+当我们只需要一个实例时，可以用立即执行函数直接生成。
+
+```javascript
+	var foo = (function coolModule(){
+        var something = "something";
+        var list = [1,2,3];
+        function doSomething() {
+            console.log(something);
+        }
+        function joinList() {
+            console.log(list.join("*"));
+        }
+        return{
+            doSomething: dosomething,
+            joinList: joinList
+        }
+    })();
+	foo.doSomething();		// something;
+	foo.joinList();			// 1*2*3;
+```
+
+模块也是普通的函数，当我们需要传入参数时，可以直接传入参数。
+
+```javascript
+	function coolModule(id){
+        function identify(){
+            console.log(id);
+        }
+        return {
+            identify: identify;
+        }
+    }
+	var foo1 = coolModule("123");
+	var foo2 = coolModule("456");
+	foo1.identify();		//123
+	foo2.identify();		//456
+```
+
+我们也可以通过模块实例对内部保留对公共API的引用，对模块实例进行修改，添加或删除他们的属性。
+
+```javascript
+	var foo = (function indentify(id){
+        function change(){
+            publicApi.identify = identify2;
+        }
+        function identify1(){
+            console.log(id);
+        }
+        function identify2(){
+            console.log(id.toUpperCase);
+        }
+        var publicApi = {
+            identify: identify1,
+        }
+        return publicApi;
+    })("cool Module");
+	foo.identify();			// cool Module
+	foo.change();
+	foo.identify();			// COOL MODULE
+```
+
+
+
