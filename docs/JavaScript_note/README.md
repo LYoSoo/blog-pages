@@ -632,3 +632,227 @@ wait 执行 1000 毫秒之后，他的内部作用域仍然不会消失， `time
 
 
 
+### 第二部分 this 和 对象原型
+
+
+
+#### 第一章 关于this
+
+#### 1.1 为什么要使用this
+
+```javascript
+	function identify(){
+        return this.name.toUpperCase();
+    }
+	function speak(){
+        var greet = "hello, i am " + identify.call(this);
+        console.log(greet);
+    }
+	var me = {
+        name: "jake"
+    }
+    var you = {
+        name: "mike"
+    }
+    identify.call(me);			// JAKE;
+	identify.call(you);			// MIKE;
+	speak.call(me);				// hello, i am JAKE;
+	speak.call(you);			// hello, i am MIKE;
+```
+
+如果不想使用`this` 就要给 函数 `identify()`  和  `speak()`  显示的传入一个上下文对象；
+
+```javascript
+	function identify(context){
+        return context.name.toUpperCase();
+    }
+	function speak(context){
+        var greet = "hello, i am " + identify(context);
+        console.log(greet);
+    }
+	var me = {
+        name: "jake"
+    }
+	identify(me);		// JAKE
+	speak(me);			// hello, i am JAKE
+```
+
+可以看到， `this` 使用了一种更优雅的方式来隐式的“传递” 一个对象引用，使得API设计的更加简洁和容易复用。
+
+#### 1.2 this
+
+看下面的代码 
+
+```1
+	function foo(num){
+        console.log("foo" + num);
+        this.num ++;
+    }
+	foo.count = 0;
+	var i;
+	for(i = 0; i < 10; i++){
+        if(i > 5){
+            foo(i);
+        }
+    }
+	//我们想通过 foo.count 计数 来打印出foo调用的次数
+	console.log(foo.count);			//  0;
+```
+
+> ​		当我们执行到 foo.count = 0 时，的确向函数对象`foo` 增加了一个属性 `count ` ， 但函数内部代码的 `this` 指向并不相同。
+
+**`this` 在任何情况下，都不指向函数的词法作用域**
+
+```javascript
+	function foo() {
+        var a = 2;
+        this.bar();
+    }
+	function bar(){
+        console.log(this.a);
+    }
+	foo();			// ReferenceError: a is not defined;
+//		实际上this.bar() 正常是调用不成功的 
+```
+
+#### this 到底是什么
+
++ this 是运行时绑定的，并不是在编写时绑定的，他的上下文取决于函数调用时的各种条件。this的绑定和函数声明的位置没有任何关系，只取决于函数的调用方式。
++ 当函数被调用时，会创建一个活动记录（简称： 上下文），这个记录会包含函数在哪里调用，调用的方式，函数的参数等等，this 就是这个记录的属性，在函数执行的时候会被用到。
++ 可以理解为，this 的指向完全取决于函数在哪里调用。
+
+
+
+### 第二章   this 全面解析
+
+在理解this 之前，首先要理解
+
++ 调用位置： 调用位置就是函数在代码中被调用的位置（而不是声明的位置）。
++ 调用栈：为了达到当前调用位置所调用的所有函数。 
+
+调用位置其实就是当前执行的函数前一个调用。
+
+```javascript
+	function baz(){
+        //调用栈是   baz   
+        //当前调用位置是全局作用域
+        console.log("baz");
+        bar();	//bar 调用位置
+    }
+	function bar(){
+        // 调用栈 baz => bar
+        console.log("bar");
+		//  当前调用位置在 baz 中
+        foo();	// foo 调用位置
+    }
+	function foo(){
+        // 调用栈  baz => bar => foo
+        // 当前调用位置在 bar 中；
+        console.log("foo");
+    }
+	baz();		// baz的调用位置
+```
+
+#### 绑定规则
+
+##### 2.1 默认绑定
+
+```javascript
+	function foo(){
+        console.log(this.a);
+    }
+	var a = 2;
+	foo();		//2
+```
+
+> ​	上面代码 `var a = 2 ` 是全局变量，在调用函数 foo ()  时，应用了`this`  的默认绑定，因此 `this` 指向全局对象。 
+
+##### 2.2 隐式绑定
+
+```javascript
+	function foo(){
+        console.log(this.a);
+    }
+	var obj = {
+        a: 2,
+        foo: foo,
+    }
+    obj.foo();	//	2
+```
+
+> ​	首先要注意foo 的声明方式，以及后续被当作引用属性添加到 `obj ` 当中，这个函数严格来说并不属于 `obj` 这个对象。
+>
+> ​	调用位置会根据上下文来引用函数，也可以说函数被调用时， obj 对象 拥有或者包含他。
+>
+> ​	当函数被调用时，前面确实加上了对obj 的引用，当函数引用有上下文对象时，隐式绑定规则会把 `this` 绑定到这个上下文对象，因此调用 `foo()` 时，`this` 被绑定到 `obj`， 因此， `this.a`  与 `obj.a` 是一样的。
+
+*对象属性引用链只有上一层或者最后一层在调用的位置中起作用。*
+
+```java
+	function foo(){
+        console.log(this.a);
+    }
+	var obj2 = {
+        a = 2,
+        foo: foo,
+    }
+	var obj1 = {
+        a = 1,
+        obj2: obj2,
+    }
+	foo();		//2
+```
+
+**隐式丢失**
+
+一个常见的this 绑定问题就是被隐式绑定的函数会丢失绑定对象，也就是会应用默认绑定，把this 绑定在 全局  或者 "undefined"上。
+
+```javascript
+	function foo(){
+        console.log(this.a);
+    }
+	var obj = {
+        a: 2,
+        foo: foo
+    }
+    var bar = obj.foo;
+	var a = "global a";
+	bar();			// "global a";
+```
+
+> ​	虽然 bar 是对 obj.foo 的一个引用，实际上引用的是 foo 函数本身，此时  bar() 是一个不带任何修饰符的函数调用，因此应用了默认绑定。
+
+另一个更常见的出现在传入回调的时候
+
+```javascript
+	function foo(){
+        console.log(a);
+    }
+	function doFoo(fn){
+        fn();
+    }
+	var obj = {
+        a: 1,
+        foo: foo
+    }
+    var a = "global a";
+	doFoo(obj.foo);			//"global a"
+```
+
+> ​	参数传递其实就是隐性赋值，我们传入函数时也会被隐性赋值。
+
+##### 2.3 显示绑定
+
+我们可以通过 `call()` 和 `apply()`  来进行显示绑定
+
+```javascript
+	function foo(){
+        console.log(this.a)
+    }
+	var obj = {
+        a: 2,
+    }
+    foo.call(obj);			//2
+```
+
+> ​		通过foo.call(obj)  可以在调用foo 时 把他的 `this` 强制绑定在 `obj` 上。
