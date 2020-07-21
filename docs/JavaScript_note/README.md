@@ -856,3 +856,237 @@ wait 执行 1000 毫秒之后，他的内部作用域仍然不会消失， `time
 ```
 
 > ​		通过foo.call(obj)  可以在调用foo 时 把他的 `this` 强制绑定在 `obj` 上。
+>
+> ​		如果你传入的是一个原始值（字符串类型、布尔类型 、数字类型）当作 `this` 的绑定对象，这个原始值会被转换成他的对象形式 ( 也就是 new String(...), new Boolean(...), new Number(...)) 这也叫做装箱。
+>
+> **1 硬绑定**
+>
+> ```javascript
+> 	function foo(){
+>         console.log(this.a);
+>     }
+> 	var obj = {
+>         a: 2,
+>     }
+>     var bar = function(){
+>         foo.call(obj);
+>     }
+>     bar();		//2
+> 	setTimeout( bar(), 1000 );		//2
+> 	bar.call(window);		//2		硬绑定之后无法在修改他的this
+> ```
+>
+> > ​	在上面的代码里，我们创建了bar 函数, 并在他的内部手动调用了 foo.call(obj) ， 因此强制的把 foo 的 this 绑定到了 obj。 无论之后如何调用函数 bar, 他总会手动在obj 上调用 foo ， 这种绑定是一种显示的绑定，我们也叫他硬绑定。
+
+硬绑定的典型应用场景就是创建一个包裹函数，负责接受参数并返回值。
+
+```javascript
+	function foo(something) {
+        console.log(this.a, something);
+        return this.a + something;
+    }
+	var obj = {
+        a: 2
+    }
+    var bar = function () {
+        foo.call(obj, arguments);
+    }
+    var b = bar(3);		// 2  3
+	console.log(b)  	// 5
+```
+
+另一个使用方法是创建可重复使用的辅助函数
+
+```javascript
+	function foo(something){
+        console.log(this.a, something);
+        return this.a + something;
+    }
+	var obj = {
+        a: 2
+    }
+    function bind(fn, obj){
+        return function () {
+            return fn.call(obj, arguments)
+        }
+    }
+	var bar = bind(foo, obj);
+	var b = bar(3);		//2 3
+	console.log(b);		//5
+```
+
+由于硬绑定是一种常用的模式， 所以 ES5 提供了一种内置方法  `Function.prototype.bind` 。
+
+```javascript
+	function foo(something) {
+        console.log(this.a, something);
+        return this.a + something;
+    }
+	var obj = {
+        a: 2
+    }
+	var bar = foo.bind(3);		// 2 3
+	console.log(bar);			// 5
+```
+
+bind()	会返回一个硬编码的新函数，它会把你指定的参数设置为 `this` 的上下文并调用原始参数。
+
+##### 2.4 new 绑定
+
+使用new 来调用函数，会自动执行下面的操作
+
++ 创建一个全新的对象。
++ 这个新对象会执行[[prototype]] 的连接。
++ 这个新对象会绑定到函数调用的 this。 
++ 如果函数没有返回对象，那么 new 表达式中的函数调用会自动返回这个新对象。
+
+```javascript
+	function foo(a){
+        this.a = a;
+    }
+	var bar = new foo(2);
+	console.log(bar.a); 	//2	
+```
+
+使用new 来调用 foo(...) 时，我们会构造一个新的对象，并把它绑定在 foo (...) 调用中的 this 上。
+
+
+
+#### 绑定优先级
+
+默认绑定优先级最低
+
++ 隐式绑定和显示绑定：
+
+  ```javascript
+  	function foo() {
+          console.log(this.a);
+      }
+  	var obj1 = {
+          a: 1,
+          foo: foo
+      }
+      var obj2 = {
+          a: 2,
+          foo: foo
+      }
+      obj1.foo();		//	1
+  	obj2.foo();		//  2
+  	obj1.foo.call(obj2);		//2
+  	obj2.foo.call(obj1);		//1
+  ```
+
+  所以显示绑定优先级比隐式绑定更高
+
+  > 现在优先级关系    显示绑定 > 隐式绑定 > 默认绑定-+
+
+
+
++  下面看new 和 隐式绑定的优先级关系
+
+  ```javascript
+  	function foo(something){
+          this.a = something;
+      }
+  
+  	var obj1 = {
+          foo: foo
+      }
+      
+      var obj2 = {}
+      obj1.foo(2);
+  	console.log(obj1.a);		//2
+  
+  	obj1.foo.call(obj2, 3);		
+  	console.log(obj2.a);		//3
+  
+  	var bar = new obj1.foo(4);
+  	console.log(obj1.a);		//2
+  	console.log(bar.a);			//4
+  ```
+
+  可以看出 new 绑定比隐式绑定优先级高。
+
+  
+
+我们可以根据优先级来判断函数在某个调用位置应用的哪条规则。
+
++ 函数是否在 new 中调用，如果是的话 this 绑定的是新调用的对象。
+
+  ```javascript
+  	var bar = new foo();
+  ```
+
++ 函数是否通过 call 、 apply (显示绑定) 或者 硬绑定调用，如果是的话， this 绑定的是指定的对象
+
+  ```javascript
+  	var bar = foo.call(obj);		
+  ```
+
++ 函数是否在某个上下文环境中调用（隐式绑定），如果是的话， this 绑定的就是那个上下文对象。
+
+  ```javascript
+  	var bar = obj.foo();
+  ```
+
++ 如果都不是的话，就是默认绑定，在严格模式下，就绑定到undefined，否则是全局对象。
+
+  ```javascript
+  	var bar = foo();
+  ```
+
+  
+
+##### 2.5 this 词法
+
+箭头函数不是通过function 关键字进行定义的，是使用 ` => ` 定义的，箭头函数不使用上述4条规则，而是根据外层的作用域来决定 `this` 。
+
+```javascript
+	function foo(){
+        return (a) => {
+            console.log(this.a);
+        }
+    }
+	var obj1 = {
+        a: 1
+    }
+    var obj2 = {
+        a: 2
+    }
+    var bar = foo.call(obj1);
+	bar.call(obj2);			//1
+```
+
+foo 内部创建的箭头函数会捕获调用时 foo() 的 this， 由于 foo 的 this  绑定到了 obj1,  bar(引用箭头函数）的this 也会绑定的 obj1，箭头函数的绑定无法修改。
+
+```javascript
+	function foo() {
+        setTimeout(() => {
+            console.log(this.a);
+        }, 1000)
+    }
+	var obj = {
+        a: 1
+    }
+    foo.call(obj);		// 1
+```
+
+> ​	箭头函数可以像 this 一样确保函数的 `this` 被绑定到指定的对象
+
+在 ES6 之前还可以用另一种方式取代箭头函数
+
+```javascript
+	function foo(){
+        var that = this;
+        setTimeout(() => {
+            console.log(that.a);
+        }, 1000)
+    }
+	var obj = {
+        a: 1
+    }
+    foo.call(obj);
+```
+
++ 只用词法作用域，并且抛弃错误 this 风格的代码
++ 完全采用 this 的风格， 必要时使用 bind() ， 尽量避免使用 that = this 以及箭头函数。
