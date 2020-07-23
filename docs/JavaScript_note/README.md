@@ -683,7 +683,7 @@ wait 执行 1000 毫秒之后，他的内部作用域仍然不会消失， `time
 
 看下面的代码 
 
-```1
+```javascript
 	function foo(num){
         console.log("foo" + num);
         this.num ++;
@@ -788,7 +788,7 @@ wait 执行 1000 毫秒之后，他的内部作用域仍然不会消失， `time
 
 *对象属性引用链只有上一层或者最后一层在调用的位置中起作用。*
 
-```java
+```javascript
 	function foo(){
         console.log(this.a);
     }
@@ -1090,3 +1090,35 @@ foo 内部创建的箭头函数会捕获调用时 foo() 的 this， 由于 foo �
 
 + 只用词法作用域，并且抛弃错误 this 风格的代码
 + 完全采用 this 的风格， 必要时使用 bind() ， 尽量避免使用 that = this 以及箭头函数。
+
+
+
+
+
+### 第三章、 对象
+
+
+
+####	3.1 语法
+
+​		对象可以通过两种形式来定义： 声明（文字）形式和构造形式。
+
+​		对象的文字语法：
+
+```javascript
+	var myObj = {
+        key: value
+    }
+```
+
+​		构造形式：
+
+```javascript
+	var myObj = new Object();
+	myObj.key = value;
+```
+
+> ​	上面两种方式声明的对象是一样的，只不过通过文字形式可以直接声明多个键值对，而构造形式需要逐个添加属性。
+
+
+
