@@ -1150,6 +1150,11 @@ JavaScript 内置了一些对象子类型，也成为内置对象
 ```javascript
 	var str = "i am a string";
 	typeof str;		// string;
-	
+	str instanceof String;	//	false
+
+	var strObj = new String("i am a string");
+	typeof strObj; 	//object;
+	strObj instanceof String;	//true;
 ```
 
+引擎会自动的把字面量转换成 String ， 我们可以访问上面的一些方法
