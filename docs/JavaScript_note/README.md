@@ -1157,4 +1157,120 @@ JavaScript 内置了一些对象子类型，也成为内置对象
 	strObj instanceof String;	//true;
 ```
 
-引擎会自动的把字面量转换成 String ， 我们可以访问上面的一些方法
+引擎会自动的把字面量转换成 String ， 我们可以访问上面的一些方法；
+
+#### 3.3内容
+
+​		对象的内容是有一些存储在特定位置的值组成的，我们称之为属性， 这些值不会存储在对象容器的内部，存储在对象容器内部的是这些值的名称，他们就像指针一样，指向这些值真正的存储位置。
+
+```javascript
+	var obj = {
+        name: "jack";
+    }
+    obj.name    //jack
+	obj["name"]	//jack
+```
+
+> ​	当我们想要访问 `obj` 中 `name` 的值，我们可以通过 `.` 操作符 或者 `[""]` 操作符，`.` 语法通常被称为属性访问， `[""]` 语法通常被成为键值对访问，这两种方式访问的是同一个地址， 都会返回 `name` 的值为 `jack`。
+
+​		在对象中，属性名永远是字符串，如果你使用字符串以外的类型来作为对象名，他会首先被转换成字符串。
+
+```javascript
+	var obj = { };
+	obj[true] = "foo";
+	obj[3] = "bar";
+	obj[obj] = "baz";
+
+	obj["true"];	//foo
+	obj["3"];		//bar
+	obj["obj"];		//baz
+```
+
+​		如果我们需要可计算属性名，我们可以用 `[]`这种方式。
+
+```javascript
+	var pre = "pre"	
+	var obj = { 
+    	[pre + "bar"]: "bar",
+        [pre + "foo"]: "foo",
+    };
+	obj["prebar"];	//bar;
+	obj["prefoo"];	//foo;
+```
+
+##### 属性描述符
+
+​		在ES5之前，JavaScript 语言本身没有提供可以直接监测属性特性的方法，比如判断是否可读，在ES5开始，所有的属性都具备的属性描述符。
+
+```javascript
+	var obj = {
+        name: "jack";
+    }
+    Object.getOwnPropertyDescriptor(obj, "name");
+	//{
+    //	writable: true,				可写
+    //  enumerable: true,			可枚举
+    //  configurable: true,			可配置
+    //}
+```
+
+##### [[GET]]
+
+```javascript
+	var obj = {
+        name: "jack";
+    }
+    obj.name;	//jack;
+```
+
+​		上面看起来是一次属性访问，但这条语句并不仅仅是在 obj 内部查找 `a`的属性，对象内置的 [[GET]] 操作首先在 `obj` 内部查找是否具有相同的属性，如果找到则返回这个属性的值， 如果找不到，会按照一条链继续寻找，也就是原型链， 如果无论如何都找不到该属性，则返回 `undefined`。
+
+
+
+#### 3.4遍历
+
+对于数值类型的数组来说，可以使用标准的 for 循环进行遍历
+
+```javascript
+	var arr = [1,2,3];
+	for(var i =0; i< arr.length; i++){
+        console.log(arr[i]);
+    }		//这种其实不是遍历值，是在遍历数组的下标，对其进行取值。
+```
+
+ES 6 增加了一种遍历数组的方法 for... of
+
+```javascript
+	var arr = [1,2,3];
+	for(var v of arr){
+        console.log(v);
+    }
+```
+
+for ... of 循环会首先向被访问对象请求一个迭代器对象， 然后通过迭代器对象的`next()` 方法来遍历所有的返回值。
+
+数组内部含有内置的 `@@iterator` ， 因此for ... of 可以直接应用到数组上。
+
+```javascript
+	var arr = [1,2,3];
+	var item = arr[Symbol.iterator]();
+	item.next();		//{value: 1, done: false};
+	item.next();		//{value: 2, done: false};
+	item.next();		//{value: 3, done: false};
+	item.next();		//{done: true};
+```
+
+
+
+### 第四章、混合对象“类”
+
+​		上一章介绍了对象，这章介绍类相关的面向对象的编程。在研究类的具体机制之前，先说说面向类的设计模式： 实例化、继承、多态。
+
+#### 类
+
+类、继承描述了一种代码的组织结构形式—— 一种在软件中对真实世界领域中的建模方法。
+
+面向对象的编程强调的是数据和操作数据的行为本质上是相互关联的， 好的设计就是把数据以及他的相关行为打包起来。这样也称为数据结构。
+
+​		在 `ES6` 之前，JavaScript 中只有近似类的语法结构如： `new` 和 `instanceof`  在 `ES6` 中，增加了 `class` 关键字。
+
