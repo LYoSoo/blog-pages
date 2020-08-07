@@ -1274,3 +1274,19 @@ for ... of 循环会首先向被访问对象请求一个迭代器对象， 然�
 
 ​		在 `ES6` 之前，JavaScript 中只有近似类的语法结构如： `new` 和 `instanceof`  在 `ES6` 中，增加了 `class` 关键字。
 
+
+
+
+
+###  第五章、[[Prototype]]
+
+​		JavaScript 中有一个特殊的内置属性 `[[Prototype]]`， 其实就是对其他对象的引用，几乎所有的对象在创建时，`[[prototype]]`属性都会被赋予一个非空的值。
+
+```javascript
+	var obj = {
+        name: "jack";
+    }
+```
+
+
+
