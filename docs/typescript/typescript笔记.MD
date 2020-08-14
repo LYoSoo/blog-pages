@@ -2,7 +2,7 @@
  * @Date: 2020-08-10 16:56:43
  * @Author: LYoSoo
  * @LastEditors: LYoSoo
- * @LastEditTime: 2020-08-12 17:10:45
+ * @LastEditTime: 2020-08-14 09:25:13
 -->
 ## Typescript
 
@@ -111,7 +111,7 @@
 		return defaultConfig;
 	}
 	let hadSetConfig = setConfig({ name: "nameStr" });
-	```
+```
 
 
 #### 只读属性
@@ -242,9 +242,67 @@ interface Point {
         config.reset = function (){};
         return config;
     }
-	let c = getCOnfig();
+	let c = getConfig();
 	c(10);
 	c.reset();
 	c.interval;
 ```
 
+#### 接口继承类
+	当接口继承了类类型的时候，他会继承类的成员但不会对其实现。就像接口提供了所有类中存在的成员，但是没有提供实现
+	接口同样会继承到类中的private和protected成员， 这意味着当你创建一个接口继承一个拥有私有或者被保护的成员的类时，这个接口类型只能被这个类或者子类实现（implement）
+```typescript
+	class Control {
+		private name: string;
+	}
+	interface getControl extends Control {
+		getName(): void;
+	}
+	class Button extends Control implements getControl {
+		getName(){ }
+	}
+	class Input extends Control;
+	class Image implements getControl{ 
+		getName(){ } 
+	 }		//报错， Image 缺少 name；
+	//  getControl 包含了 control 的所有成员，包括私有的name 因为name 是私有成员，所以必须是control的子类才能实现getControl接口
+	//  因为只有control的子类才能包含一个声明于control的私有成员  name
+```
+
+### 四、类
+
+	之前我们已经接触过类了, 下面是一个类的例子
+```typescript
+	class Person {
+		name: string;
+		constructor( yourName: string ){
+			this.name = yourName;
+		}
+		sayHello() {
+			return "Hello," + this.name;
+		}
+	}
+	let firstPerson = new Person("jack");	
+	//使用new 构建了Person的新实例，他会调用之前的构造函数，创建一个Person类型的新对象，并执行构造函数对其进行初始化。
+	firstPerson.sayHello();
+```
+
+#### 继承
+	在ts中 我们最常用的是面向对象模式，基于类的程序设计最基本的模式时允许使用继承来扩展现有的类
+```typescript
+	class Animal {
+		move(dist: number = 0){
+			console.log(`i had moved ${dist} meters`);
+		}
+	}
+	class Dog extends Animal{
+		bark(){
+			console.log("汪");
+		}
+	}
+	const newDog = new Dog();
+	newDog.bark();
+	newDog.move(10);
+	newDog.bark();
+	// Dog 是派生类， 派生自 Animal基类		通常把Dog 这种派生类叫做子类，  Animal这种基类叫做 超类
+```
