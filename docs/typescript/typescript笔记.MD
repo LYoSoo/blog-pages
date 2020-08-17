@@ -111,12 +111,13 @@
 		return defaultConfig;
 	}
 	let hadSetConfig = setConfig({ name: "nameStr" });
+	```
 ```
 
 
 #### 只读属性
 
-```typescript
+​```typescript
 interface Point {
 		readonly x: number;
 		readonly y: number;
@@ -306,3 +307,34 @@ interface Point {
 	newDog.bark();
 	// Dog 是派生类， 派生自 Animal基类		通常把Dog 这种派生类叫做子类，  Animal这种基类叫做 超类
 ```
+
+更复杂的继承
+
+```typescript
+	class Animal{
+        name: string;
+        constructor(theName: string){
+            this.name = theName;
+        }
+        move(dist: number = 0){
+            console.log(`${this.name} moved ${dist} m`);
+        }
+    }
+	class Snake extends Animal{
+        constructor(name: string){
+            super(name);
+        }
+        move(distMeter = 5){
+            super.move(distMeter);
+        }
+    }
+	class Horse extends Animal{
+        constructor(name: string){
+            super(name);
+        }
+        move(distMeter = 20){
+            super.move(distMeter)
+        }
+    }
+```
+
