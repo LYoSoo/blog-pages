@@ -2,7 +2,7 @@
  * @Date: 2020-08-10 16:56:43
  * @Author: LYoSoo
  * @LastEditors: LYoSoo
- * @LastEditTime: 2020-08-14 09:25:13
+ * @LastEditTime: 2020-08-25 11:39:34
 -->
 ## Typescript
 
@@ -338,3 +338,212 @@ interface Point {
     }
 ```
 
+
+
+#### 公有、私有、受保护的修饰符
+
+
+
+默认为 `public`， 在定义的时候未修饰，均为`public`， 我们也可以主动添加 `public`。
+
+```typescript
+	class Animal {
+        public name: string;
+        public constructor(theName: string){
+            this.name = theName;
+        }
+        public sayHello(){
+            console.log(`i am ${this.name}`);
+        }
+    }
+```
+
+##### private
+
+当成员被标记为`private` 的时候，他就不能在他声明类的外部访问。
+
+```typescript
+	class Animal {
+        private name: string;
+        constructor(theName: string){
+            this.name = theName;
+        }
+    }
+	new Animal("jack").name 	//error  'name'是私有变量
+```
+
+
+
+当我们比较带有 `private` 和 `protected` 的成员类型的时候，如果其中一个类型包含 `private` 成员，那么只有另一个类型也存在这样一个 `private`成员，并且他俩来自同一处声明的时候，我们才认为他俩是兼容的， `protected` 也适用与这一规则。
+
+```typescript
+	class Animal {
+        private name: string;
+        constructor(theName: string){
+            this.name = theName;
+        }
+    }
+	class Horse extends Animal{
+        constructor(){
+            super("horse");
+        }
+    }
+	class People {
+        private name: string;
+        constructor(theName: string){
+            this.name = theName;
+        }
+    }
+	
+	let animal = new Animal("anim");
+	let horse = new Horse();
+	let people = new People("prople");
+	animal = horse; 		// true;
+	animal = new People("jack")		// error Animal与People 不兼容
+```
+
+
+
+#### protected
+
+`protected` 与 `private` 类似， 但是 `protected` 在派生类中依然可以访问。
+
+```typescript
+	class People {
+        protected name: string;
+        constructor(theName: string){
+            this.name = theName;
+        }
+    }
+	class Jack extends People{
+        private age: number;
+        constructor(theName: string,theAge: string){
+            super(name);
+            this.age = theAge;
+        }
+        public sayHello(){
+            console.log(`i am ${this.name} and ${this.age}`);
+        }
+    }
+	let jack2 = new Jack("jack", 18);
+	jack2.sayHello();
+	jack2.name;			//error;
+```
+
+##### readonly修饰符
+
+```typescript
+	class Animal{
+        readonly name: string;
+        readonly age: number = 18;
+        constructor(theName: string){
+            this.name = theName;
+        }
+    }
+	let horse = new Animal("i am a horse");
+	hores.name = "jack";		//error  name是只读的；
+```
+##### 静态属性
+
+静态属性是指那些存在类的本身而不是类的实例上，当每个实例想要访问类的静态属性时，需要在前面加上类的名字
+```typescript
+	class Animal{
+		static names = "jack";
+		getName() {
+			console.log(Animal.names);
+		}
+	}
+	let horse = new Animal();
+	horse.getName();
+
+```
+
+#### 抽象类 abstract
+>	抽象类作为其他派生类的基类使用，一般不会直接被实例化，抽象类可以包含成员的实现细节。
+```typescript
+	abstract class Animal {
+		abstract sayHello(): void;
+		move(): void {
+			console.log("moved");
+		}
+	}
+```
+抽象类的方法不包含具体的实现，而且必须在派生类中实现。
+```typescript
+	abstract class Animal{
+		constructor(name: string){
+
+		}
+		abstract sayHello(): void;
+		consoleName(): void{
+			console.log(this.name);
+		}
+	}
+	class Horse extends Animal {
+		constructor(){
+			super("horesName");
+		}
+		sayHello(): void{
+			console.log("hello");
+		}
+		sayGoodbye(): void{
+			console.log("goodBye");
+		} 
+	}
+
+	let animal: Animal;		//允许创建一个对抽象类型的引用。
+	animal = new Animal();		// 错误，不能创建一个抽象类的实例。
+	animal = new Hores();		//可以对抽象子类进行实例化和赋值。
+	animal.consoleName();
+	animal.sayHello();
+	animal.sayGoodbye();		//错误，方法声明在抽象类中不存在。
+
+```
+
+### 五、函数
+>	和JavaScript一样，在typescript中你可以创建有名字的函数和匿名函数.
+```JavaScript
+	function add(x,y){
+		return x + y;
+	}
+	let myAdd = function(x, y){
+		return x + y;
+	}
+	// 上面这两种方式是在js中很常见的函数。
+```
+在 ts 中的函数
+```typescript
+	function add(x: number, y: number): number{
+		return x + y;
+	}
+	let myAdd = function (x: number, y: number): number {
+		return x + y;
+	}
+	//为 myAdd 书写完整的函数类型
+	let myAdd: (x: number, y: number) => number = function (x: number, y: number): number{
+		return x + y;
+	}
+
+```
+在ts中 每个函数的参数都是必须的，并且相对应.
+```typescript
+	function consoleName(firstName: string, lastName: string){
+		console.log(firstName + lastName);
+	}
+	consoleName("lv");	//error
+	consoleName("lv", "hong", "tao") //error;
+	consoleName("lv", "hongtao")	// 正确;
+	
+	//可选参数  参数类型前面 ?: 表示该参数为可选参数，就是可穿可不穿。不传递的时候，默认为undefined
+	function getName(firstName: string, lastName?: string){
+		console.log(firstName + lastName)
+	}
+	getName("lv");
+	getName("lv", "hongtao");
+	getName("lv", "hong", "tao");	//errror;	不可超出参数个数。
+	
+	//同时我们也可以为可选参数设置默认值。 当可选参数未传递进来值时，该参数为默认值，传递进来时为传递的值。
+	function getName2(firstName: string, lastName = "hongtao"){
+		console.log(firstName + lastName);
+	}
+```
