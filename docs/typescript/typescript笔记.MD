@@ -2,7 +2,7 @@
  * @Date: 2020-08-10 16:56:43
  * @Author: LYoSoo
  * @LastEditors: LYoSoo
- * @LastEditTime: 2020-08-25 11:39:34
+ * @LastEditTime: 2020-08-31 17:06:57
 -->
 ## Typescript
 
@@ -534,7 +534,7 @@ interface Point {
 	consoleName("lv", "hong", "tao") //error;
 	consoleName("lv", "hongtao")	// 正确;
 	
-	//可选参数  参数类型前面 ?: 表示该参数为可选参数，就是可穿可不穿。不传递的时候，默认为undefined
+	//可选参数  参数类型前面 ?: 表示该参数为可选参数，就是可传可不传。不传递的时候，默认为undefined
 	function getName(firstName: string, lastName?: string){
 		console.log(firstName + lastName)
 	}
@@ -546,4 +546,141 @@ interface Point {
 	function getName2(firstName: string, lastName = "hongtao"){
 		console.log(firstName + lastName);
 	}
+```
+
+##### 剩余参数
+> 	当你不确定要有多少参数传进来，可以用剩余参数来表示
+```typescript
+	function person (firstName: string, ...restName: string[]){
+		return firstName + " " + restName.join(" ");
+	}
+	let jack = person("first", "second", "third");
+```
+
+
+### 六、泛型
+```typescript
+	//当我们不使用泛型的时候，函数是这样的
+	function consoleInfo(name: string): string{
+		return name;
+	}
+	//或者我们给变量赋予any类型
+	function consoleInfo2(name: any): any {
+		return name;
+	}
+```
+	这样就存在一个问题，当我们使用any类型的时候，上述函数可以接受任意类型的参数，这样丢失了一些信息，传入参数与返回参数应该是相等的
+	因此，我们需要一种方法使传入参数和返回的参数相同，也就是类型变量
+```typescript
+	function consoleName<T>(name: T): T {
+		return name;
+	}
+	//这个函数就叫做泛型，可以适用多种变量类型。
+	let jack = consoleName<string>("myName");
+	let tom = consoleName("name");
+	//上面两种方法都是可以的，第一种我们明确了 T 就是string类型
+	//第二种方法我们利用了类型推论，也就是编译器会根据传入的参数自动确定参数 T 的类型。
+	function arrayT<T> (arr: T[]): T[]{
+		return arr;
+	}
+	//或者下面这种方法
+	function arrayT2 <T> (arr: Array<T>): Array<T>{
+		return arr;
+	}
+```
+
+##### 泛型类型
+>	泛型函数类型与非泛型函数类型没什么区别, 只不过在前面多一个类型声明
+```typescript
+	function person<T>(name: T): T {
+		return name;
+	}
+	let jack: <T>(name: T) => T = person;
+	//我们可以使用不同的泛型参数名， 只要能够对应上即可
+	let tom: <Y>(name: Y) => Y = person;
+```
+##### 泛型接口
+```typescript
+	interface PersonInter{
+		<T>(name: T): T;
+	}
+	function person<T>(name: T): T{
+		return name;
+	}
+	let name: PersonInter = person;
+
+	//我们也可以把泛型参数当作整个接口的参数，这样我们在使用时可以很清楚的知道他们的类型
+	interface AnimalInter<T>{
+		(name: T): T;
+	}
+	function animal<T>(name: T): T {
+		return name;
+	}
+	let horse: AnimalInter<string> = animal;
+```
+
+##### 泛型类
+```typescript
+	class Animal<T> {
+		age: T;
+		add(x: T, y: T) => T;
+	}
+	let horse = new Animal<number>();
+	horse.age = 18;
+	horse.add = function(x, y){return x + y};
+```
+
+##### 泛型约束
+```typescript
+	function lengFn<T>(len: T): T {
+		console.log(len.length);		//error T dont have .length
+		return len;
+	}
+	//可以看出 T 并不是每种类型都有 .length 属性
+	// 但我们可以人为设定一个约束
+	interface LengthWise{
+		length: number;
+	}
+	function lengFn2<T extends LengthWise>(name: T): T{
+		console.log(name.length);
+		return name;
+	}
+	//这样我们就完成了对泛型的约束，但是同样的，他也变得不在适用于所有的类型
+	lengFn2(3);		//error
+	lengFn2({length: 12});
+	lengFn2([]);
+	lengFn2("");
+```
+
+### 七、枚举
+之前已经用到过枚举,我们来看一个简单的数字枚举
+```typescript
+	enum Type{
+		Up,
+		Down,
+		Left,
+		Right
+	}
+	// 或者我们可以给枚举值赋值
+	enum Type1{
+		Up = 1,
+		Down,	//2
+		Left,	//3
+		Right, //4
+	}
+	//应用枚举
+	function move(dist: number, dirc: Type1){
+
+	}
+	move(12, Type1.Down);	
+```
+字符串枚举
+```typescript
+	enum Type{
+		Up = "up",
+		Down = "down",
+		Left = "left",
+		Right = "Right",
+	}
+	//在字符串枚举中，每一个变量都必须进行初始化
 ```
