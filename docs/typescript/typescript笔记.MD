@@ -680,7 +680,19 @@ interface Point {
 		Up = "up",
 		Down = "down",
 		Left = "left",
-		Right = "Right",
+		Right = "Right
+        
 	}
 	//在字符串枚举中，每一个变量都必须进行初始化
 ```
+
+反向映射
+
+```typescript
+	enum Type{
+        A
+    }
+	let a = Type.A;
+	let name = Type[a];		// name = A;
+```
+
