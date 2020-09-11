@@ -2,7 +2,7 @@
  * @Date: 2020-08-10 16:56:43
  * @Author: LYoSoo
  * @LastEditors: LYoSoo
- * @LastEditTime: 2020-08-31 17:06:57
+ * @LastEditTime: 2020-09-01 14:35:48
 -->
 ## Typescript
 
@@ -684,15 +684,42 @@ interface Point {
         
 	}
 	//在字符串枚举中，每一个变量都必须进行初始化
-```
-
-反向映射
-
+``` 
+##### 反向映射
 ```typescript
 	enum Type{
-        A
-    }
+		A
+	}
 	let a = Type.A;
-	let name = Type[a];		// name = A;
+	let name = Type[a];		// name: A;
 ```
 
+##### const枚举
+为了避免在额外生成代码上的开销和额外的非直接枚举成员的访问，我们可以使用const枚举
+```typescript
+	const enum Type{
+		A = 1,
+		B = A * 2,
+	}
+```
+##### 外部枚举
+外部枚举用来描述已经存在的枚举类型的形状
+```typescript
+	declare enum Type{
+		A = 1,
+		B,
+		C = 3,
+	}
+```
+
+### 八、类型推论
+在typescript中，没有明确指出类型的地方，类型推论会帮助我们推算出类型
+```typescript
+	let x = 3;
+	//变量X的类型被推断为数字，这种推断一般发生在初始化变量和成员，设置默认参数和决定参数返回值的时候。
+	// 当需要从几个表达式中推断类型的时候，会使用这些表达式类型推断出最合适的通用类型
+	let y = [0, 1, null];
+	//	系统会从 number 和 null 中选择出一个兼容所有类型的
+	
+	
+```
