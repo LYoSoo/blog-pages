@@ -11,3 +11,8 @@
 
 ## [你不知道的JavaScript_笔记](/JavaScript_note)
 
+## [KMP算法](/kmp-algorithm)
+
+## [原型链与继承](/prototype)
+
+## [typescript](/typescript)
