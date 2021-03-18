@@ -16,3 +16,7 @@
 ## [原型链与继承](/prototype)
 
 ## [typescript](/typescript)
+
+## [Javascript 的6种继承方式](/inherit)
+
+## [Promise重点](/Promise)
