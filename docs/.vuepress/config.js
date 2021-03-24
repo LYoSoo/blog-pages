@@ -20,7 +20,7 @@ module.exports = {
         logo: "/img/logo.jpg",
         nav: [ // 导航栏配置
             { text: 'GitHub', link: 'https://github.com/LYoSoo' },
-            { text: '有问题请问我', link: 'https://baidu.com' }
+            { text: '有问题请问google', link: 'https://google.com' }
         ],
         // sidebar: {
         //     // '/': [

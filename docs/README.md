@@ -20,3 +20,5 @@
 ## [Javascript 的6种继承方式](/inherit)
 
 ## [Promise重点](/Promise)
+
+## [Promise源码实现过程](/Promise-code)
