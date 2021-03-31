@@ -146,7 +146,38 @@ CSS的伪类是以 `: ` 作为前缀的关键字，当你希望样式在特定�
 | A + B  | 相邻兄弟选择器 （B 是 A 的下一个兄弟节点， A B 在同一个父节点下面， A后面就是 B） |
 | A ~ B  | 通用兄弟选择器 （B 是 A 的兄弟节点中的任意一个，只要是在同一个父节点下面） |
 
- 
+ ### CSS 优先级
+
+​		优先级也可以叫做权重，当我们写的CSS代码被浏览器解析并生效的时候，是根据权重来决定那一个样式生效，两个选择器同时作用在一个元素上的时候，权重高的会生效，下面来看一张理解并记忆权重的图。
+
+![IE盒模型](http://175.24.187.2:12345/box-sizing/box-css.png)
+
+当我们组合使用的时候，采取权重相加的方式
+
+```html
+	#id .container		// 100 + 10;
+	#id div				// 100 + 1;
+```
+
+> ​	两个样式都使用了 ! important 的时候， 权重值高的显示。
+>
+> ​	#root{
+>
+> ​			color: red  !important;		
+>
+> ​	}
+>
+> ​	.container{
+>
+> ​			color: green !important;	
+>
+> ​	}
+>
+> ​	root 中的样式生效。
+
++ CSS同一个组合写了两次， 后面的样式会覆盖前面的样式。
++ 样式指向同一个元素的时候，权重大的样式生效。
++ 
 
 ### BFC
 
@@ -175,10 +206,10 @@ CSS的伪类是以 `: ` 作为前缀的关键字，当你希望样式在特定�
 ​		只要元素满足下面任一条件即可触发BFC 特性：
 
 + 处在body 根元素
-+ 浮动元素： float 除 none 以外的任何值
++ 浮动元素： float： left / right
 + 绝对定位元素： position (absolute 、fixed)
 + display 为 inline-block、 table-cells、flex
-+ overflow 除了visible 以外的值 （hidden 、auto）
++ overflow :  hidden 、auto、overlay、scroll
 
 ##### 四、BFC特性及应用
 
@@ -234,3 +265,55 @@ CSS的伪类是以 `: ` 作为前缀的关键字，当你希望样式在特定�
     
 
 ![image-20210330223749609](http://175.24.187.2:12345/BFC/BFC2.png)
+
+ 2. BFC可以包含浮动的元素（清除浮动）
+
+    ```html
+    <div style="border: 10px solid #1676FE">
+    	<div style="width: 200px; height: 200px; background: #FAA; float: left"></div>        
+    </div>
+    ```
+
+    ![BFC3](http://175.24.187.2:12345/BFC/BFC3.png)
+
+    因为现在内部div 浮动，所以脱离了外层div的包裹，我们需要触发外层div 的 BFC 这样就可以完成了包裹。
+
+    ```html
+     <!--浮动元素： float left、 right
+     绝对定位元素： position (absolute 、fixed)
+     display 为 inline-block、 table-cells、flex
+     overflow  （hidden 、auto、overlay、scroll）
+    	上面这几种方式都可以触发BFC特性。
+    -->
+    <div style="border: 10px solid #1676FE; overflow: hidden">
+    	<div style="width: 200px; height: 200px; background: #FAA; float: left"></div>        
+    </div>
+    ```
+
+    ![BFC4](http://175.24.187.2:12345/BFC/BFC4.png)
+
+3. BFC可以阻止元素被浮动元素覆盖
+
+   ```html
+   <div style="width: 200px; height: 200px; background: #1676FE; float: left">
+       style="width: 100px; height: 100px; background: #1676FE; float: left"
+   </div>
+   <div style="width: 300px; height: 300px; background: #FAA; ">
+       这是未触发BFC效果之前的样子width: 300px; height: 300px; background: #FAA;
+   </div>
+   ```
+
+   ![BFC5](http://175.24.187.2:12345/BFC/BFC5.png)
+
+**触发BFC之后**
+
+```html
+ <div style="width: 200px; height: 200px; background: #1676FE; float: left">
+    style="width: 100px; height: 100px; background: #1676FE; float: left"
+</div>
+<div style="width: 300px; height: 300px; background: #FAA; overflow: auto;">
+    这是触发BFC效果之后的样子 width: 300px; height: 300px; background: #FAA; overflow: auto;
+</div>
+```
+
+![BFC6](http://175.24.187.2:12345/BFC/BFC6.png)
