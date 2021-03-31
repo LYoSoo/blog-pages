@@ -88,11 +88,11 @@
 
 ​		下面有两张非常经典的原型链的图片，展示了常见场景的原型原型链之间的关系。
 
-![原型图片1](C:\Users\吕宏涛Y\Desktop\js相关知识点\原型图片1.png)
+![原型图片1](http://175.24.187.2:12345/prototype/%E5%8E%9F%E5%9E%8B%E5%9B%BE1.png)
 
 
 
-![原型图2](C:\Users\吕宏涛Y\Desktop\js相关知识点\原型图2.png)
+![原型图2](http://175.24.187.2:12345/prototype/%E5%8E%9F%E5%9E%8B%E5%9B%BE2.png)
 
 ```javascript
 	// 关于几个 instanceof 的例子

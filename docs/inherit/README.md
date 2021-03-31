@@ -33,7 +33,7 @@
 	console.log(jack.grades)  //[23,55,12,444];			所有实例的访问的都是同一个属性。
 ```
 
-![](F:\360MoveData\Users\Administrator\Desktop\继承方式\继承方式.png)
+![继承](http://175.24.187.2:12345/inherit/inherit1.png)
 
 ​		2. 创建Child实例时，不能向 Parent 传参。
 
@@ -72,7 +72,7 @@
 ​		**特点**
 
    				1.  解决了原型链继承的共享属性的问题。
-      				2.  可以传递参数。
+            				2.  可以传递参数。
 
 ​      **缺点**
 
@@ -186,7 +186,7 @@
 	var jack = new Child("jack", 18);
 ```
 
-![image-20210317212446208](C:\Users\吕宏涛Y\AppData\Roaming\Typora\typora-user-images\image-20210317212446208.png)
+![image-20210317212446208](http://175.24.187.2:12345/inherit/inherit2.png)
 
 由于两次 调用 Parent 函数导致产生了2组 "name" , "color";
 
