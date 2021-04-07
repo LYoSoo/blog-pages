@@ -69,6 +69,7 @@
 	Fcuntion.prototype.bindClone = function(context){
         const self = this;
         // 第一个args 是 bind 传入的参数。 （形参）
+        console.log(context);
         var args = Array.prototype.slice.call(arguments, 1);
         return function(){
             // 这里的arguments 指的是我们调用实际返回的函数的时候的参数。  （实参）
