@@ -1,4 +1,5 @@
 <!--
+
  * @Date: 2020-08-10 16:56:43
  * @Author: LYoSoo
  * @LastEditors: LYoSoo
@@ -111,14 +112,14 @@
 		return defaultConfig;
 	}
 	let hadSetConfig = setConfig({ name: "nameStr" });
+	
 	```
-```
-
-
 #### 只读属性
 
-​```typescript
-interface Point {
+```typescript
+
+
+	interface Point {
 		readonly x: number;
 		readonly y: number;
 	}
@@ -143,8 +144,6 @@ interface Point {
 		[propName: string]: any;
 	}
 ```
-
-
 
 #### 函数类型
 >	为了表示接口的函数类型，我们需要给接口定义一个调用签名。   相当于一个只包含参数列表和返回值类型的函数定义，参数列表的每个参数都需要类型和名字
@@ -684,7 +683,7 @@ interface Point {
         
 	}
 	//在字符串枚举中，每一个变量都必须进行初始化
-``` 
+```
 ##### 反向映射
 ```typescript
 	enum Type{

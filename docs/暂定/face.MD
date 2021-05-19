@@ -45,6 +45,14 @@
 
 ```
 
+##### cookie、sessionStorage、localStorage
+
+```javascript
+	
+```
+
+
+
 ##### 深拷贝
 
 ```javascript
