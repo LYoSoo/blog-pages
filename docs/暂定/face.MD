@@ -74,7 +74,7 @@
     }
 ```
 
-##### cookie、sessionStorage、localStorage
+##### 
 
 ##### 线程、进程
 
@@ -121,9 +121,20 @@
 
 ##### 合成事件
 
-​		React有自己的一套
+​		React有自己的一套事件注册、存储、分发、重用的逻辑，减少了内存消耗，简化了事件的逻辑，最大化的解决了IE不兼容的问题。
 
-##### 事件委托、事件代理 
++ React 组件的声明事件最终绑定在了document 这个节点上，而不是React组件对应的DOM 节点。所以只有document上绑定了DOM的原生事件，其他节点上没有，简化了DOM原生事件，减少了内存的开销。
++ React 以队列的形式，从触发事件向父组建回溯，调用他们在父组建声明的callback。也就是React 组件自身的冒泡机制，使用 event.preventDefault()，阻止冒泡。
++ React有自己的合成事件 SyntheticEvent，不同类型的事件会构造不同的SyntheticEvent。
++ React 使用对象池来管理合成事件对象的创建和销毁，减少了垃圾的生成和新对象内存的分配。
+
+##### JS中的事件委托
+
+​		简单来说：就是当事件触发的时候，把要做的事委托给父元素处理。（根据冒泡机制）
+
+​		作用1： 节约内存
+
+​		作用2： 能为之后新增加的DOM元素添加事件
 
 ##### HTTP 各版本
 
@@ -157,6 +168,26 @@
 >   + 普通函数this一般是动态绑定的，只有在调用的时候才直到this的指向。
 >   + 箭头函数this没有动态生产，是在定义的时候就确定了，绑定在最近一层的普通函数上。
 > + 普通函数可以用call、apply、bind绑定，箭头函数不可以。
+
+##### new操作做了什么
+
++ 创建一个新对象
++ 将对象的\_\_proto__指向构造函数的prototype对象
++ 将构造函数的作用域赋值给新对象（就是this指向新对象）
++ 执行构造函数中的代码（为这个新对象增加属性）
++ 返回新对象
+
+```javascript
+	function newFactory(){
+        const obj = {};
+        const Constructor = [].shift.call(arguments);
+        obj.__proto__ = Constructor.prototype;
+        const result = Constructor.apply(obj, arguments);
+        return typeof result === "object" ? result : obj;
+    }
+```
+
+
 
 ##### 实现call、 bind
 
