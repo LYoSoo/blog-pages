@@ -66,6 +66,57 @@
     }
 ```
 
+##### cookie、sessionStorage、localStorage
+
+##### 线程、进程
+
+##### CORS
+
+##### setState
+
+> **先说结论：**
+>
+> + setTimeout 和原生事件中，可以立即拿到更新的结果，也就是同步。
+> + 在合成事件和生命周期中，不能立即拿到更新的结果，也就是异步。
+> + 在合成事件和生命周期中，如果对同一个值进行多次 setState， setState 的批量更新策略会对其进行覆盖，只进行最后一次更新。
+> + 如果第一个参数为对象的时候，每次修改更新前会先合并，设置为函数就不会进行合并。
+>
+> **对生命周期或者执行队列包裹了一层 try finally，最后在 finally中进行 state 的更新，所谓的异步不是真的异步，而是将更新放到了队列里，再一次性的处理这些更新。**
+
+```javascript
+	//react 内部有个变量 executionContext  默认为 NoContext， 在生命周期的时候会被赋值为  LegacyUnbatchedContext
+	//如果执行环境不为 NoContext,  仅仅是将更新放入 flushSyncCallbackQueue队里中，并不会立即调用，所以变为异步。
+```
+
+
+
+##### useCallback、 useMemo
+
+​		useCallback和useMemo都可缓存函数的引用或值，但是从更细的使用角度来说useCallback缓存函数的引用，useMemo缓存计算数据的值。
+
+```javascript
+	const memoizedCallback = useCallback(() => {
+            dosomething(a,b)
+        },[a,b])
+    // 当我们a, b 的值不变的时候，memoizedCallback的引用不会发生改变，则第一个函数参数就会被隐藏起来，从而达到性能优化的问题。
+    const memoizedValue = useMemo(() => {
+        dosomething(a,b)
+    },[a,b])
+    // 当我们在a,b 的值不变的时候，memoizedValue的值不变， 第一个函数参数不会被执行，从而达到节省计算量的目的。
+    
+```
+
++ useCallback 是根据依赖缓存第一个入参的函数。（函数）
++ useMemo 是根据依赖缓存第一个入参的函数的值。（计算性大的值）
+
+
+
+##### 合成事件
+
+​		React有自己的一套
+
+##### 事件委托、事件代理 
+
 ##### HTTP 各版本
 
 ```javascript
@@ -77,13 +128,15 @@
 	增加了POST、DELETE、PUT、HEADER请求方式
     增加了请求头和响应头，在通信中指定了HTTP协议版本号，以及其他的元信息（状态码、权限、缓存、内容编码等）
     扩充了传输的格式，图片、音视频资源、二进制都可以进行传输(content-type)
+	If-Modified-Since,Expires缓存控制
 	// HTTP：1.1
 	
+	缓存处理增加了 tag、If-None-Match
+	1.0中客户端想请求对象的一部分，但是服务端把所有的都返回来了，浪费带宽、1.1版本中引入range请求头，允许只请求资源的某一部分，返回码206
+    错误通知处理：增加了24状态码，410：服务器资源被永久删除，409：请求资源与当前的资源发生冲突
+    HOST头处理：指向真实访问的服务器的IP 
+    长连接：1.1版本支持长连接和请求的流水线处理，在一个TCP连接上可以发送多个HTTP请求，减少了关闭和连接的消耗和延迟。
 ```
-
-
-
-
 
 
 
